@@ -10,24 +10,40 @@ public class Slic3rManager {
 
 	String slic3rPath = obtenerPathCompleto("Slic3r", "Slic3r-console.exe");
 	String config;
-	String piezaPath = obtenerPathCompleto("Pieza", "Cubo_Prueba_20x20.stl");
-	String salidaPath = "/Impresora/Pieza";
+	String piezaPath = obtenerPathCompleto("Pieza", "Little_Ghost.stl");
+	String salidaPath = obtenerPathCompletoCarpeta("Pieza");
 
 	public void anadirSoportes() {
 		ProcessBuilder processBuilder = new ProcessBuilder(slic3rPath);
 	}
-
-	public String obtenerInfo() throws IOException {
+	
+	public String obtenerCapas() throws IOException {
 		String salida = "";
 		// Ejecutar comando
-		String[] infoCMD = { slic3rPath, "--info", piezaPath };
-		ProcessBuilder processBuilder = new ProcessBuilder(infoCMD);
+		String[] exportarCapas = {slic3rPath, "--export-svg", "--output", salidaPath, "--layer-height", "0.2", piezaPath};
+		ProcessBuilder processBuilder = new ProcessBuilder(exportarCapas);
 		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();
 		// Leer salida
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		while (bufferedReader.readLine() != null) {
 			salida = salida + "\n" + bufferedReader.readLine();
+		}
+		return salida;
+	}
+
+	public String obtenerInfo() throws IOException {
+		String salida = "";
+		// Ejecutar comando
+		String[] infoCMD = { slic3rPath, "--info", "--layer-height", "0.2", piezaPath };
+		ProcessBuilder processBuilder = new ProcessBuilder(infoCMD);
+		processBuilder.redirectErrorStream(true);
+		Process process = processBuilder.start();
+		// Leer salida
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String linea;
+		while ((linea = bufferedReader.readLine()) != null) {
+			salida = salida + "\n" + linea;
 		}
 		return salida;
 	}
