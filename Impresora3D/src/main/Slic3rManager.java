@@ -11,6 +11,7 @@ public class Slic3rManager {
 	String slic3rPath = obtenerPathCompleto("Slic3r", "Slic3r-console.exe");
 	String config;
 	String piezaPath = obtenerPathCompleto("Pieza", "Little_Ghost.stl");
+	String piezaPath2 = obtenerPathCompleto("Pieza", "Little_Ghost.svg");
 	String salidaPath = obtenerPathCompletoCarpeta("Pieza");
 
 	public void anadirSoportes() {
@@ -20,7 +21,7 @@ public class Slic3rManager {
 	public String obtenerCapas() throws IOException {
 		String salida = "";
 		// Ejecutar comando
-		String[] exportarCapas = {slic3rPath, "--export-svg", "--output", salidaPath, "--layer-height", "0.2", piezaPath};
+		String[] exportarCapas = {slic3rPath, "--export-svg", "--output", salidaPath, "--layer-height", "0.05", piezaPath};
 		ProcessBuilder processBuilder = new ProcessBuilder(exportarCapas);
 		processBuilder.redirectErrorStream(true);
 		Process process = processBuilder.start();
@@ -30,6 +31,13 @@ public class Slic3rManager {
 			salida = salida + "\n" + bufferedReader.readLine();
 		}
 		return salida;
+	}
+	
+	public void obtenerNumCapas() {
+		int salida;
+		String[] numCapas = {slic3rPath, };
+		
+		//return salida;
 	}
 
 	public String obtenerInfo() throws IOException {
@@ -68,5 +76,9 @@ public class Slic3rManager {
 
 	private void parsearSize(String entrada) {
 		// String[]
+	}
+	public void separarSVG() {
+		String pathSVGVompleto = obtenerPathCompleto("Pieza", "Little_Ghost.svg");
+		
 	}
 }
