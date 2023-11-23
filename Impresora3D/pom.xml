@@ -15,4 +15,11 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.apache.xmlgraphics</groupId>
+  		<artifactId>batik-all</artifactId>
+  		<version>1.17</version>
+  	</dependency>
+  </dependencies>
 </project>

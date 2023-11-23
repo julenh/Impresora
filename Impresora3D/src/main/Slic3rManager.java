@@ -1,10 +1,15 @@
 package main;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.dom.svg.SVGDocumentFactory;
+import org.w3c.dom.svg.SVGDocument;
 
 public class Slic3rManager {
 
@@ -79,6 +84,9 @@ public class Slic3rManager {
 	}
 	public void separarSVG() {
 		String pathSVGVompleto = obtenerPathCompleto("Pieza", "Little_Ghost.svg");
+		File fileSVG = new File("Pieza/Little_Ghost.svg");
+		SVGDocument svg = null;
+		
 		
 	}
 }
