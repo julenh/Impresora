@@ -30,10 +30,24 @@ class Slic3rManagerTest {
 		Slic3rManager test = new Slic3rManager();
 		// comprobar salida
 		String salida;
-		String salida2;
 		try {
 			salida = test.obtenerCapas();
 			System.out.println(salida);
+		} catch (Exception e) {
+			// handle exception
+			e.printStackTrace();
+			fail("Not yet implemented");
+		}
+	}
+	
+	@Test
+	void testSepararSVG() {
+		// test
+		Slic3rManager test = new Slic3rManager();
+		// comprobar salida
+		String salida;
+		try {
+			test.separarSVG();
 		} catch (Exception e) {
 			// handle exception
 			e.printStackTrace();
