@@ -2,15 +2,15 @@ package main;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import javax.imageio.ImageIO;
-
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
+import org.apache.batik.transcoder.TranscoderException;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -121,14 +121,21 @@ public class Slic3rManager {
 			//svgSalida.getDocumentElement().appendChild(capaI);
 			// guardar archivo
 			String nomSalida = "Capas/capa"+i+".svg";
-			File file = new File(nomSalida);
+			File fileSalida = new File(nomSalida);
 			//OutputStream outputStream = new FileOutputStream(file);
 			//Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
 			//SVGGraphics2D svgGenerator = new SVGGraphics2D(svgSalida);
 			//svgGenerator.stream(new BufferedWriter(writer), true);
-			ImageIO.write(ImageIO.read((File) svgSalida), "svg", file);
+			//ImageIO.write(ImageIO.read((File) svgSalida), "svg", file);
+			
+			escribirSVG(svgSalida, fileSalida);
 			
 			//OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("Capas/capa"+i+".svg")), "UTF-8");
 		}
+	}
+	
+	private void escribirSVG(SVGDocument entrada, File fileSalida) {
+		
+		
 	}
 }
