@@ -2,15 +2,16 @@ package main;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
-import org.apache.batik.transcoder.TranscoderException;
+import org.apache.batik.dom.util.DOMUtilities;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -111,31 +112,38 @@ public class Slic3rManager {
 			// agregar mismos atributos
 			for (int j = 0; j < atributos.getLength(); j++) {
 				Node atributoTemp = atributos.item(j);
-				String temp1 = atributoTemp.getNodeName();
-				String temp2 = atributoTemp.getNodeValue();
-				svgSalida.getDocumentElement().setAttributeNS(null, atributoTemp.getNodeName(), atributoTemp.getNodeValue());
+				String tempNombre = atributoTemp.getNodeName();
+				String tempValor = atributoTemp.getNodeValue();
+				if(!existeAtributo(svgSalida, tempNombre)) {
+					svgSalida.getDocumentElement().setAttribute( atributoTemp.getNodeName(), atributoTemp.getNodeValue());
+				}
 			}
-			String temp3 = svgSalida.getDocumentElement().getAttribute("width");
+			
 			// agregar nodo de la capa i al svg de salida i
-			Node capaI = lista.item(i);
-			//svgSalida.getDocumentElement().appendChild(capaI);
+			Element capaI = (Element) svgSalida.importNode(lista.item(i), true);
+			svgSalida.getRootElement().appendChild(capaI);
 			// guardar archivo
 			String nomSalida = "Capas/capa"+i+".svg";
-			File fileSalida = new File(nomSalida);
-			//OutputStream outputStream = new FileOutputStream(file);
-			//Writer writer = new OutputStreamWriter(outputStream, "UTF-8");
-			//SVGGraphics2D svgGenerator = new SVGGraphics2D(svgSalida);
-			//svgGenerator.stream(new BufferedWriter(writer), true);
-			//ImageIO.write(ImageIO.read((File) svgSalida), "svg", file);
+			//File fileSalida = new File(nomSalida);
 			
-			escribirSVG(svgSalida, fileSalida);
+			
+			escribirSVG(svgSalida, nomSalida);
 			
 			//OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("Capas/capa"+i+".svg")), "UTF-8");
 		}
 	}
 	
-	private void escribirSVG(SVGDocument entrada, File fileSalida) {
-		
-		
+	private void escribirSVG(SVGDocument entrada, String fileSalida) throws IOException {
+		// transformar objeto SVGDocument en texto 
+		String cabecera = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n"
+				+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n"
+				+ "";
+		String contenidoSVG = cabecera + DOMUtilities.getXML(entrada);
+		// 
+		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+	}
+	private boolean existeAtributo(SVGDocument svgSalida, String atributo) {
+		boolean salida = svgSalida.getDocumentElement().hasAttribute(atributo);
+		return salida;
 	}
 }
