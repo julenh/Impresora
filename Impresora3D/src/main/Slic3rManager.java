@@ -110,6 +110,9 @@ public class Slic3rManager {
 			String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 			SVGDocument svgSalida = (SVGDocument) impl.createDocument(svgNS, "svg", null);
 			// agregar mismos atributos
+			svgSalida.getDocumentElement().setAttribute( "width", atributos.getNamedItem("width").getNodeValue());
+			svgSalida.getDocumentElement().setAttribute( "height", atributos.getNamedItem("height").getNodeValue());
+			/**svgSalida.getDocumentElement().setAttribute( "xmlns:slic3r", atributos.getNamedItem("xmlns:slic3r").getNodeValue());
 			for (int j = 0; j < atributos.getLength(); j++) {
 				Node atributoTemp = atributos.item(j);
 				String tempNombre = atributoTemp.getNodeName();
@@ -117,19 +120,13 @@ public class Slic3rManager {
 				if(!existeAtributo(svgSalida, tempNombre)) {
 					svgSalida.getDocumentElement().setAttribute( atributoTemp.getNodeName(), atributoTemp.getNodeValue());
 				}
-			}
-			
+			}**/
 			// agregar nodo de la capa i al svg de salida i
 			Element capaI = (Element) svgSalida.importNode(lista.item(i), true);
 			svgSalida.getRootElement().appendChild(capaI);
 			// guardar archivo
 			String nomSalida = "Capas/capa"+i+".svg";
-			//File fileSalida = new File(nomSalida);
-			
-			
 			escribirSVG(svgSalida, nomSalida);
-			
-			//OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(new File("Capas/capa"+i+".svg")), "UTF-8");
 		}
 	}
 	
