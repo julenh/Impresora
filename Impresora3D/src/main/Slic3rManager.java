@@ -27,8 +27,18 @@ public class Slic3rManager {
 	String piezaPath2 = obtenerPathCompleto("Pieza", "Little_Ghost.svg");
 	String salidaPath = obtenerPathCompletoCarpeta("Pieza");
 
-	public void anadirSoportes() {
-		ProcessBuilder processBuilder = new ProcessBuilder(slic3rPath);
+	public String anadirSoportes() throws IOException {
+		String salida = "";
+		String[] exportarConSoportes = {slic3rPath, "--support-material", "--export-stl", piezaPath, "--output", salidaPath};
+		ProcessBuilder processBuilder = new ProcessBuilder(exportarConSoportes);
+		processBuilder.redirectErrorStream(true);
+		Process process = processBuilder.start();
+		// Leer salida
+		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		while (bufferedReader.readLine() != null) {
+			salida = salida + "\n" + bufferedReader.readLine();
+		}
+		return salida;
 	}
 	
 	public String obtenerCapas() throws IOException {
@@ -44,13 +54,6 @@ public class Slic3rManager {
 			salida = salida + "\n" + bufferedReader.readLine();
 		}
 		return salida;
-	}
-	
-	public void obtenerNumCapas() {
-		int salida;
-		String[] numCapas = {slic3rPath, };
-		
-		//return salida;
 	}
 
 	public String obtenerInfo() throws IOException {
