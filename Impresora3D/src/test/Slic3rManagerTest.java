@@ -13,7 +13,7 @@ class Slic3rManagerTest {
 		// test
 		Slic3rManager test = new Slic3rManager();
 		// comprobar salida
-		String salida;
+		boolean salida;
 		try {
 			salida = test.obtenerInfo();
 			System.out.println(salida);

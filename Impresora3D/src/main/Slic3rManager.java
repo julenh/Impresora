@@ -23,8 +23,7 @@ public class Slic3rManager {
 
 	String slic3rPath = obtenerPathCompleto("Slic3r", "Slic3r-console.exe");
 	String config;
-	String piezaPath = obtenerPathCompleto("Pieza", "Little_Ghost.stl");
-	String piezaPath2 = obtenerPathCompleto("Pieza", "Little_Ghost.svg");
+	String piezaPath = obtenerPathCompleto("Pieza", "pieza.stl");
 	String salidaPath = obtenerPathCompletoCarpeta("Pieza");
 
 	public String anadirSoportes() throws IOException {
@@ -56,8 +55,8 @@ public class Slic3rManager {
 		return salida;
 	}
 
-	public String obtenerInfo() throws IOException {
-		String salida = "";
+	public boolean obtenerInfo() throws IOException {
+		boolean salida = true;
 		// Ejecutar comando
 		String[] infoCMD = { slic3rPath, "--info", "--layer-height", "0.2", piezaPath };
 		ProcessBuilder processBuilder = new ProcessBuilder(infoCMD);
@@ -67,7 +66,15 @@ public class Slic3rManager {
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 		String linea;
 		while ((linea = bufferedReader.readLine()) != null) {
-			salida = salida + "\n" + linea;
+			if (linea.contains("size_y") || linea.contains("size_x")) {
+				if (Double.parseDouble(linea.split(" = ")[1]) > 10) {
+					salida = false;
+				}
+			} else if (linea.contains("size_z")) {
+				if (Double.parseDouble(linea.split(" = ")[1]) > 20) {
+					salida = false;
+				}
+			}
 		}
 		return salida;
 	}
@@ -90,10 +97,8 @@ public class Slic3rManager {
 		return salida;
 	}
 
-	private void parsearSize(String entrada) {
-		// String[]
-	}
-	public void separarSVG() throws IOException {
+	public GestorCapa separarSVG() throws IOException {
+		GestorCapa gestorCapa = new GestorCapa();
 		// leer svg exportado de slic3r con todas las capas
 		File fileSVG = new File("Pieza/Little_Ghost.svg");
 		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(null);
@@ -130,7 +135,10 @@ public class Slic3rManager {
 			// guardar archivo
 			String nomSalida = "Capas/capa"+i+".svg";
 			escribirSVG(svgSalida, nomSalida);
+			Capa capa = new Capa(nomSalida);
+			gestorCapa.lista.add(capa);
 		}
+		return gestorCapa;
 	}
 	
 	private void escribirSVG(SVGDocument entrada, String fileSalida) throws IOException {
