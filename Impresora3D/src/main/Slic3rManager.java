@@ -1,7 +1,9 @@
 package main;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -12,6 +14,10 @@ import java.nio.file.StandardOpenOption;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
 import org.apache.batik.anim.dom.SVGDOMImplementation;
 import org.apache.batik.dom.util.DOMUtilities;
+import org.apache.batik.transcoder.Transcoder;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -100,7 +106,7 @@ public class Slic3rManager {
 	public GestorCapa separarSVG() throws IOException {
 		GestorCapa gestorCapa = new GestorCapa();
 		// leer svg exportado de slic3r con todas las capas
-		File fileSVG = new File("Pieza/Little_Ghost.svg");
+		File fileSVG = new File("Pieza/pieza.svg");
 		SAXSVGDocumentFactory factory = new SAXSVGDocumentFactory(null);
 		SVGDocument svgDoc = factory.createSVGDocument(fileSVG.toURI().toString());
 		// obtener longitud y anchura del canvas de las capas
@@ -133,22 +139,32 @@ public class Slic3rManager {
 			Element capaI = (Element) svgSalida.importNode(lista.item(i), true);
 			svgSalida.getRootElement().appendChild(capaI);
 			// guardar archivo
-			String nomSalida = "Capas/capa"+i+".svg";
-			escribirSVG(svgSalida, nomSalida);
+			
+			String nomSalida = "Capas/capa"+i+".png";
+			escribirPNG(svgSalida, nomSalida);
 			Capa capa = new Capa(nomSalida);
 			gestorCapa.lista.add(capa);
 		}
 		return gestorCapa;
 	}
 	
-	private void escribirSVG(SVGDocument entrada, String fileSalida) throws IOException {
-		// transformar objeto SVGDocument en texto 
+	private void escribirPNG(SVGDocument entrada, String fileSalida) throws IOException {
+		/* transformar objeto SVGDocument en texto 
 		String cabecera = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n"
 				+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n"
 				+ "";
 		String contenidoSVG = cabecera + DOMUtilities.getXML(entrada);
 		// 
-		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);*/
+		PNGTranscoder transcoder = new PNGTranscoder();
+		TranscoderInput input = new TranscoderInput();
+		try {
+			FileOutputStream outputStream = new FileOutputStream(fileSalida);
+			TranscoderOutput output = new TranscoderOutput();
+			transcoder.transcode(input, output);
+		} catch (Exception e) {
+			// handle exception
+		}
 	}
 	private boolean existeAtributo(SVGDocument svgSalida, String atributo) {
 		boolean salida = svgSalida.getDocumentElement().hasAttribute(atributo);

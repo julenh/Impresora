@@ -8,12 +8,12 @@ public class Impresora {
 
 	public static void main(String[] args) {
 		
-
+		cargarPieza();
 		
 		
 	}
 	
-	private void cargarPieza() {
+	private static void cargarPieza() {
 
 		SwingUtilities.invokeLater(new Runnable() {
 
