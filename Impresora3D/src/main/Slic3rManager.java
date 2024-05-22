@@ -2,6 +2,7 @@ package main;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.StringReader;
@@ -166,16 +167,24 @@ public class Slic3rManager {
 	
 	private void escribirPNG(SVGDocument entrada, String fileSalida) throws IOException {
 		// transformar objeto SVGDocument en texto 
-		//String cabecera = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n"
-			//	+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n"
-				//+ "";
-		//String contenidoSVG = cabecera + DOMUtilities.getXML(entrada);
-		String contenidoSVG = DOMUtilities.getXML(entrada);
+		/*String contenidoSVG = DOMUtilities.getXML(entrada);
 		DOMUtilities.getPrefix(contenidoSVG);
-		
 		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-		
-		//Transcoder transcoder = new PNGTranscoder();
+		*/
+		Transcoder transcoder = new PNGTranscoder();
+		TranscoderInput input = new TranscoderInput(entrada);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		FileOutputStream fos;
+		try {
+			TranscoderOutput output = new TranscoderOutput(outputStream);
+            transcoder.transcode(input, output);
+            fos = new FileOutputStream(fileSalida);
+            fos.write(outputStream.toByteArray());
+		} catch (Exception e) {
+			// handle exception
+			e.printStackTrace();
+			
+		}
 		
 	}
 	private boolean existeAtributo(SVGDocument svgSalida, String atributo) {
