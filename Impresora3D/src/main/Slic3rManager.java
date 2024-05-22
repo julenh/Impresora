@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
@@ -19,11 +20,13 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
 import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.svg.SVGDocument;
+import org.xml.sax.XMLReader;
 
 public class Slic3rManager {
 
@@ -117,27 +120,40 @@ public class Slic3rManager {
 		// obtener lista de capas 
 		NodeList lista = svgDoc.getRootElement().getElementsByTagName("g");
 		// crear un svg por cada capa
+		NodeList nodos = svgDoc.getRootElement().getChildNodes();
+		for (int j = 0; j < nodos.getLength(); j++) {
+			String a = nodos.item(j).getBaseURI();
+		}
 		for (int i = 0; i < lista.getLength(); i++) {
 			Element node = (Element) lista.item(i);
 			// crear documento svg
 			DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
 			String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 			SVGDocument svgSalida = (SVGDocument) impl.createDocument(svgNS, "svg", null);
+			
+			DocumentType doctype = impl.createDocumentType("svg", "-//W3C//DTD SVG 1.0//EN", "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd");
+            //svgSalida.insertBefore(doctype, svgSalida.getDocumentElement());
+
+	        Element svgRoot = svgSalida.getDocumentElement();
+	        svgRoot.setAttributeNS(null, "contentScriptType", "text/ecmascript");
+	        svgRoot.setAttributeNS(null, "width", anchura);
+	        //svgRoot.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+	        svgRoot.setAttributeNS(null, "zoomAndPan", "magnify");
+	        svgRoot.setAttributeNS(null, "contentStyleType", "text/css");
+	        svgRoot.setAttributeNS(null, "height", longitud);
+	        svgRoot.setAttributeNS(null, "preserveAspectRatio", "xMidYMid meet");
+	        svgRoot.setAttributeNS(null, "version", "1.0");
+
+	        Element gElement = svgSalida.createElement("g");
+
 			// agregar mismos atributos
-			svgSalida.getDocumentElement().setAttribute( "width", atributos.getNamedItem("width").getNodeValue());
-			svgSalida.getDocumentElement().setAttribute( "height", atributos.getNamedItem("height").getNodeValue());
-			/**svgSalida.getDocumentElement().setAttribute( "xmlns:slic3r", atributos.getNamedItem("xmlns:slic3r").getNodeValue());
-			for (int j = 0; j < atributos.getLength(); j++) {
-				Node atributoTemp = atributos.item(j);
-				String tempNombre = atributoTemp.getNodeName();
-				String tempValor = atributoTemp.getNodeValue();
-				if(!existeAtributo(svgSalida, tempNombre)) {
-					svgSalida.getDocumentElement().setAttribute( atributoTemp.getNodeName(), atributoTemp.getNodeValue());
-				}
-			}**/
-			// agregar nodo de la capa i al svg de salida i
+			gElement.setAttribute( "width", anchura);
+			gElement.setAttribute( "height", longitud);
+			
 			Element capaI = (Element) svgSalida.importNode(lista.item(i), true);
-			svgSalida.getRootElement().appendChild(capaI);
+			gElement.appendChild(capaI);
+			
+			svgRoot.appendChild(gElement);
 			// guardar archivo
 			
 			String nomSalida = "Capas/capa"+i+".png";
@@ -149,22 +165,18 @@ public class Slic3rManager {
 	}
 	
 	private void escribirPNG(SVGDocument entrada, String fileSalida) throws IOException {
-		/* transformar objeto SVGDocument en texto 
-		String cabecera = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n"
-				+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n"
-				+ "";
-		String contenidoSVG = cabecera + DOMUtilities.getXML(entrada);
-		// 
-		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);*/
-		PNGTranscoder transcoder = new PNGTranscoder();
-		TranscoderInput input = new TranscoderInput();
-		try {
-			FileOutputStream outputStream = new FileOutputStream(fileSalida);
-			TranscoderOutput output = new TranscoderOutput();
-			transcoder.transcode(input, output);
-		} catch (Exception e) {
-			// handle exception
-		}
+		// transformar objeto SVGDocument en texto 
+		//String cabecera = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\r\n"
+			//	+ "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.0//EN\" \"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n"
+				//+ "";
+		//String contenidoSVG = cabecera + DOMUtilities.getXML(entrada);
+		String contenidoSVG = DOMUtilities.getXML(entrada);
+		DOMUtilities.getPrefix(contenidoSVG);
+		
+		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+		
+		//Transcoder transcoder = new PNGTranscoder();
+		
 	}
 	private boolean existeAtributo(SVGDocument svgSalida, String atributo) {
 		boolean salida = svgSalida.getDocumentElement().hasAttribute(atributo);
