@@ -157,21 +157,21 @@ public class Slic3rManager {
 			svgRoot.appendChild(gElement);
 			// guardar archivo
 			
-			String nomSalida = "Capas/capa"+i+".png";
-			escribirPNG(svgSalida, nomSalida);
+			String nomSalida = "Capas/capa"+i+".svg";
+			escribirSVG(svgSalida, nomSalida);
 			Capa capa = new Capa(nomSalida);
 			gestorCapa.lista.add(capa);
 		}
 		return gestorCapa;
 	}
 	
-	private void escribirPNG(SVGDocument entrada, String fileSalida) throws IOException {
+	private void escribirSVG(SVGDocument entrada, String fileSalida) throws IOException {
 		// transformar objeto SVGDocument en texto 
-		/*String contenidoSVG = DOMUtilities.getXML(entrada);
+		String contenidoSVG = DOMUtilities.getXML(entrada);
 		DOMUtilities.getPrefix(contenidoSVG);
 		Files.write(Paths.get(fileSalida), contenidoSVG.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-		*/
-		Transcoder transcoder = new PNGTranscoder();
+		
+		/*Transcoder transcoder = new PNGTranscoder();
 		TranscoderInput input = new TranscoderInput(entrada);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		FileOutputStream fos;
@@ -184,7 +184,7 @@ public class Slic3rManager {
 			// handle exception
 			e.printStackTrace();
 			
-		}
+		}*/
 		
 	}
 	private boolean existeAtributo(SVGDocument svgSalida, String atributo) {
