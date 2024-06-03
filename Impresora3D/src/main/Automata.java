@@ -16,7 +16,7 @@ public class Automata {
 	
 	private SerialPort encontrarPuerto() {
 		SerialPort[] puertos = SerialPort.getCommPorts();
-		for (SerialPort puerto : puertos) {
+		for (SerialPort puerto : puertos) { 
 			if (esPuerto(puerto)) {
 				return puerto;
 			}
